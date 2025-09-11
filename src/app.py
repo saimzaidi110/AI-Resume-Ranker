@@ -10,7 +10,7 @@ import uuid
 app = Flask(__name__, template_folder="../templates")
 app.secret_key = "supersecret"
 
-UPLOAD_FOLDER = Path("data/uploads")
+UPLOAD_FOLDER = Path("data/uploads").resolve()
 UPLOAD_FOLDER.mkdir(exist_ok=True, parents=True)
 
 TMP_FOLDER = Path("data/tmp")
@@ -94,9 +94,16 @@ def index():
 
     return render_template("index.html")
 
-@app.route("/download/<filename>")
+
+@app.route("/download/<path:filename>", endpoint="download_resume")
 def download_resume(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename, as_attachment=True)
+    safe_name = secure_filename(filename)
+    return send_from_directory(
+        UPLOAD_FOLDER,
+        safe_name,
+        as_attachment=True,
+        download_name=safe_name
+    )
 
 
 @app.route("/feedback", methods=["POST"])
@@ -125,6 +132,16 @@ def history():
     else:
         tables = ["<p>No feedback yet.</p>"]
     return render_template("history.html", tables=tables)
+
+
+
+
+# --- Reset route: clears old results and goes home ---
+@app.route("/reset")
+def reset():
+    session.pop("results_file", None)
+    return redirect(url_for("index"))
+
 
 
 # -----------------------------

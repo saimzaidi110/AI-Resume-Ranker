@@ -26,6 +26,10 @@
   <div class="container py-4">
     <div class="card shadow p-4">
       <h3 class="mb-3">Top Ranked Candidates</h3>
+          <div class="mb-3 text-end">
+      <a class="btn btn-secondary" href="{{ url_for('reset') }}">🔄 New Search</a>
+    </div>
+
 
       <!-- Filters -->
       <form method="GET" action="{{ url_for('index') }}" class="row g-3 mb-4">
@@ -92,8 +96,9 @@
                 </div>
               </td>
               <td>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_resume', filename=r.filename) }}">⬇
-                  Download</a>
+                <a class="btn btn-outline-primary btn-sm"
+   href="{{ url_for('download_resume', filename=r.filename) }}"
+   download="{{ r.filename }}">⬇ Download</a>
               </td>
               <td>
                 <select class="form-select form-select-sm" name="decision_{{ r.filename }}">
