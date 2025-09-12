@@ -129,6 +129,8 @@ def feedback():
     # Redirect to feedback history page or another page after feedback submission
     return redirect(url_for("history"))
 
+
+
 @app.route("/history")
 def history():
     # Show feedback history in a table
