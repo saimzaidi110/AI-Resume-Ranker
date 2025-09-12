@@ -106,26 +106,32 @@ def download_resume(filename):
     )
 
 
+# Path to store feedback data
+FEEDBACK_FILE = Path("data/feedback.csv")
+
 @app.route("/feedback", methods=["POST"])
 def feedback():
     decisions = []
+    # Iterate over form items and capture feedback for each resume
     for key, value in request.form.items():
         if key.startswith("decision_") and value:
             filename = key.replace("decision_", "")
-            decisions.append([filename, value])
+            decisions.append([filename, value])  # Store filename and feedback
 
     if decisions:
+        # Convert feedback to DataFrame and save to CSV
         df = pd.DataFrame(decisions, columns=["filename", "decision"])
         if FEEDBACK_FILE.exists():
-            df.to_csv(FEEDBACK_FILE, mode="a", header=False, index=False)
+            df.to_csv(FEEDBACK_FILE, mode="a", header=False, index=False)  # Append feedback
         else:
-            df.to_csv(FEEDBACK_FILE, index=False)
+            df.to_csv(FEEDBACK_FILE, index=False)  # Create new file if doesn't exist
 
+    # Redirect to feedback history page or another page after feedback submission
     return redirect(url_for("history"))
-
 
 @app.route("/history")
 def history():
+    # Show feedback history in a table
     if FEEDBACK_FILE.exists():
         df = pd.read_csv(FEEDBACK_FILE)
         tables = [df.to_html(classes="table table-striped", index=False)]
@@ -133,6 +139,12 @@ def history():
         tables = ["<p>No feedback yet.</p>"]
     return render_template("history.html", tables=tables)
 
+    from retrain_model import retrain_model  # Import retrain function
+
+@app.route("/retrain", methods=["GET"])
+def retrain():
+    retrain_model()  # Call retrain function to retrain the model
+    return "Model retrained successfully!"
 
 
 
