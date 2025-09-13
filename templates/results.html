@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <style>
-  /* ====== Page chrome (unchanged) ====== */
+
   body {
     background: radial-gradient(1100px 600px at 10% -10%, #e9f1ff 0%, transparent 55%),
       radial-gradient(1000px 500px at 100% 0%, #eafff4 0%, transparent 55%),
@@ -78,58 +78,47 @@
   .modal-backdrop { z-index: -1; }
   .modal-body { max-height: 60vh; overflow-y: auto; }
 
-  /* ====== Table: compact, no horizontal scroll, no right-sticky cols ====== */
-
-  /* Always keep container from horizontal scrolling */
   .table-responsive {
     width: 100%;
-    overflow-x: hidden !important;   /* requested: disable horizontal scroll */
+    overflow-x: hidden !important;  
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Stable layout: no overlap between columns */
   #resultTable {
     width: 100%;
-    table-layout: fixed;             /* fixes overlapping in Score/Exp */
+    table-layout: fixed;            
     border-collapse: collapse;
     border-spacing: 0;
   }
 
-  /* Tighter row padding */
   #resultTable th, #resultTable td {
     padding: .45rem .6rem;
     vertical-align: middle;
   }
 
-  /* Column widths via colgroup (make sure your table uses matching <col> classes) */
-  /* Total ≈ 100% */
-  #resultTable col.filename { width: 35%; }   /* compact filename column; shows prefix + ellipsis */
+  #resultTable col.filename { width: 35%; } 
   #resultTable col.score    { width: 12%; }
   #resultTable col.exp      { width: 12%; }
-  #resultTable col.actions  { width: 21%; }   /* stacked buttons fit comfortably */
+  #resultTable col.actions  { width: 21%; }   */
   #resultTable col.decision { width: 20%; }
 
-  /* Filename crops to one line; full value still in title= tooltip */
   .filename-cell {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  /* Keep header sticky only (no right sticky columns to avoid overlay) */
   #resultTable thead th {
     position: sticky;
     top: 0;
     z-index: 2;
   }
 
-  /* Numeric columns readable and aligned */
   #resultTable td:nth-child(2),
   #resultTable td:nth-child(3) {
     font-variant-numeric: tabular-nums;
   }
 
-  /* Action buttons stacked vertically, compact spacing */
   .actions-stack {
     display: grid;
     grid-auto-rows: min-content;
@@ -144,7 +133,6 @@
     white-space: nowrap;
   }
 
-  /* Small screens: slightly adjust proportions */
   @media (max-width:576px) {
     #resultTable col.filename { width: 38%; }
     #resultTable col.score    { width: 12%; }
@@ -153,10 +141,9 @@
     #resultTable col.decision { width: 18%; }
   }
 
-  /* ==== Preview Modal Always Light ==== */
 #previewModal .modal-content {
-  background: #ffffff !important;   /* pure white canvas */
-  color: #111111 !important;        /* dark text */
+  background: #ffffff !important;   
+  color: #111111 !important;        
 }
 
 #previewModal .modal-header,
@@ -165,7 +152,6 @@
   color: #111111 !important;
 }
 
-/* Make sure any elements coming from DOC/DOCX stay dark on white */
 #resumePreviewHtml,
 #resumePreviewHtml * {
   background: #ffffff !important;
@@ -222,7 +208,6 @@
   <main class="container mb-5">
     <div class="blur-card p-4 p-lg-5">
 
-      <!-- Filters -->
       <form method="GET" action="{{ url_for('index') }}" class="row g-3 align-items-end mb-4">
         <div class="col-md-3">
           <label class="form-label fw-semibold">Minimum Score</label>
@@ -244,7 +229,6 @@
         </div>
       </form>
 
-      <!-- KPIs -->
       <div class="row g-3 mb-4">
         <div class="col-md-4">
           <div class="p-3 rounded border bg-body">
@@ -277,7 +261,6 @@
         </div>
       </div>
 
-      <!-- Results Table -->
       <form method="POST" action="{{ url_for('feedback') }}">
         <div class="table-responsive">
           <table id="resultTable" class="table table-hover align-middle">
@@ -301,7 +284,7 @@
     {% for r in ranked %}
     <tr>
       <td class="filename-cell" title="{{ r.filename }}">
-        {{ r.filename[:12] }}   <!-- 12-char prefix -->
+        {{ r.filename[:12] }} 
       </td>
       <td title="{{ r.score }}">
         {{ ("%.6f"|format(r.score))[:5] }}
@@ -311,14 +294,12 @@
       </td>
      <td>
   <div class="actions-stack">
-    <!-- PREVIEW BUTTON (required for JS listener) -->
 <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#previewModal">
     Preview
 </button>
 
 
 
-      <!-- <i class="bi bi-file-earmark-text me-1"></i> -->
 
     <a class="btn btn-outline-primary btn-sm"
        href="{{ url_for('download_resume', filename=r.filename) }}"
@@ -375,7 +356,7 @@
 <script src="https://unpkg.com/mammoth/mammoth.browser.min.js"></script>
 
   <script>
-    // theme toggle
+  
     const html = document.documentElement;
     const themeToggle = document.getElementById('themeToggle');
     const savedTheme = localStorage.getItem('theme');
@@ -392,7 +373,7 @@
       localStorage.setItem('theme', t);
     });
 
-    // back to top
+ 
     const toTop = document.getElementById('toTop');
     window.addEventListener('scroll', () => {
       toTop.classList.toggle('d-none', window.scrollY < 300);
@@ -410,11 +391,10 @@
       if (el.value === '' || el.value === null) el.value = '0';
     }
 
-    // On blur, empty => 0
     scoreInput && scoreInput.addEventListener('blur', () => ensureZero(scoreInput));
     expInput   && expInput.addEventListener('blur',   () => ensureZero(expInput));
 
-    // On submit, empty => 0 (final safety net)
+   
     form.addEventListener('submit', (e) => {
       ensureZero(scoreInput);
       ensureZero(expInput);
@@ -424,12 +404,12 @@
 
 <script>
 (function () {
-  // Build opaque token (base64url) so URL me ".pdf" na aaye
+
   function b64url(str){
     return btoa(unescape(encodeURIComponent(str))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
 
-  // Preview ke liye opaque route (no .pdf in path or query)
+  
   const PREVIEW_TEMPLATE = "{{ url_for('preview_bin', id='__TOKEN__') }}";
   const buildPreviewUrl = (filename) => PREVIEW_TEMPLATE.replace('__TOKEN__', b64url(filename));
 
@@ -439,8 +419,14 @@
 function showIframe(url) {
     const frame = document.getElementById('resumePreviewFrame');
     const htmlBox = document.getElementById('resumePreviewHtml');
-    if (htmlBox) { htmlBox.style.display = 'none'; htmlBox.innerHTML = ''; }
-    if (frame) { frame.style.display = 'block'; frame.src = url || 'about:blank'; }
+    if (htmlBox) { 
+        htmlBox.style.display = 'none'; 
+        htmlBox.innerHTML = ''; 
+    }
+    if (frame) { 
+        frame.style.display = 'block'; 
+        frame.src = url || 'about:blank'; 
+    }
 }
 
 
@@ -459,15 +445,19 @@ function showIframe(url) {
     }
   });
 
-  // PDF: fetch octet-stream, wrap into 'application/pdf', show via blob:
+
 async function renderPdfViaBlob(url) {
     const res = await fetch(url, { credentials: 'same-origin', cache: 'no-store' });
     if (!res.ok) throw new Error('pdf-fetch-failed');
-    const raw = await res.blob();  // Fetch the file as a blob
-    const pdf = new Blob([raw], { type: 'application/pdf' });  // Force type as PDF
-    _pdfBlobUrl = URL.createObjectURL(pdf);  // Create object URL
-    showIframe(_pdfBlobUrl);
+    const raw = await res.blob(); 
+    const pdf = new Blob([raw], { type: 'application/pdf' });  
+    _pdfBlobUrl = URL.createObjectURL(pdf);  
+
+   
+    const frame = document.getElementById('resumePreviewFrame');
+    frame.src = _pdfBlobUrl;  
 }
+
 
 async function renderDocLikeWithMammoth(url) {
     const res = await fetch(url, { credentials: 'same-origin', cache: 'no-store' });
@@ -497,7 +487,7 @@ function showIframe(url) {
 
     try {
       if (lowerName.endsWith('.pdf')) {
-        showIframe('about:blank');            // never direct URL
+        showIframe('about:blank');        
         await renderPdfViaBlob(fileUrl);
         return;
       }
@@ -506,14 +496,14 @@ function showIframe(url) {
         await renderDocLikeWithMammoth(fileUrl);
         return;
       }
-      // other types fallback
+   
       window.open(fileUrl, '_blank', 'noopener');
     } catch {
       window.open(fileUrl, '_blank', 'noopener');
     }
   }
 
-  // Delegate clicks from existing Preview buttons
+
   document.addEventListener('click', function(e){
     const btn = e.target.closest('button[data-bs-toggle="modal"][data-bs-target^="#previewModal"]');
     if(!btn) return;

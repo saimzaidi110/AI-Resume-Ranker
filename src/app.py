@@ -98,7 +98,6 @@ def download_resume(filename):
         download_name=safe_name
     )
     
-
 @app.get("/preview_bin")
 def preview_bin():
     """
@@ -122,14 +121,9 @@ def preview_bin():
     if not full_path or not os.path.isfile(full_path):
         abort(404)
 
-    # Check file extension and set the MIME type accordingly
-    mime_type, _ = mimetypes.guess_type(full_path)
-    if not mime_type:
-        mime_type = 'application/octet-stream'
+    # Set MIME type for PDF
+    mime_type = 'application/pdf'
 
-    if filename.lower().endswith(".pdf"):
-        mime_type = 'application/pdf'
-    
     resp = send_file(full_path, mimetype=mime_type,
                      as_attachment=False, download_name=os.path.basename(full_path))
     resp.headers["Cache-Control"] = "no-store"
