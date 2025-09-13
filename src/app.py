@@ -20,9 +20,6 @@ FEEDBACK_FILE = Path("data/feedback.csv")
 FEEDBACK_FILE.parent.mkdir(exist_ok=True, parents=True)
 
 
-# -----------------------------
-# Process Uploaded Resumes
-# -----------------------------
 def process_uploaded_resumes(files):
     resumes = []
     for f in files:
@@ -43,9 +40,7 @@ def process_uploaded_resumes(files):
     return resumes
 
 
-# -----------------------------
-# Routes
-# -----------------------------
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
@@ -55,13 +50,10 @@ def index():
         if not jd_text.strip() or not uploaded_resumes:
             return render_template("index.html", error="Please upload resumes and provide a job description.")
 
-        # Process resumes
         resumes = process_uploaded_resumes(uploaded_resumes)
 
-        # Rank resumes
         ranked = rank_resumes(jd_text, resumes)
 
-        # ✅ Save results to a temporary JSON file instead of session
         file_id = str(uuid.uuid4())
         results_file = TMP_FOLDER / f"results_{file_id}.json"
         with open(results_file, "w", encoding="utf-8") as f:
@@ -71,14 +63,12 @@ def index():
 
         return render_template("results.html", jd=jd_text, ranked=ranked)
 
-    # Handle filters if results already exist
     if request.method == "GET" and "results_file" in session:
         results_file = Path(session["results_file"])
         if results_file.exists():
             with open(results_file, "r", encoding="utf-8") as f:
                 ranked = json.load(f)
 
-            # Apply filters
             min_score = float(request.args.get("min_score", 0))
             min_exp = int(request.args.get("min_exp", 0))
             keyword = request.args.get("keyword", "").lower()
@@ -106,34 +96,30 @@ def download_resume(filename):
     )
 
 
-# Path to store feedback data
+#  Path to store feedback data
 FEEDBACK_FILE = Path("data/feedback.csv")
 
 @app.route("/feedback", methods=["POST"])
 def feedback():
     decisions = []
-    # Iterate over form items and capture feedback for each resume
     for key, value in request.form.items():
         if key.startswith("decision_") and value:
             filename = key.replace("decision_", "")
-            decisions.append([filename, value])  # Store filename and feedback
+            decisions.append([filename, value])  
 
     if decisions:
-        # Convert feedback to DataFrame and save to CSV
         df = pd.DataFrame(decisions, columns=["filename", "decision"])
         if FEEDBACK_FILE.exists():
-            df.to_csv(FEEDBACK_FILE, mode="a", header=False, index=False)  # Append feedback
+            df.to_csv(FEEDBACK_FILE, mode="a", header=False, index=False) 
         else:
-            df.to_csv(FEEDBACK_FILE, index=False)  # Create new file if doesn't exist
+            df.to_csv(FEEDBACK_FILE, index=False) 
 
-    # Redirect to feedback history page or another page after feedback submission
     return redirect(url_for("history"))
 
 
 
 @app.route("/history")
 def history():
-    # Show feedback history in a table
     if FEEDBACK_FILE.exists():
         df = pd.read_csv(FEEDBACK_FILE)
         tables = [df.to_html(classes="table table-striped", index=False)]
@@ -141,16 +127,16 @@ def history():
         tables = ["<p>No feedback yet.</p>"]
     return render_template("history.html", tables=tables)
 
-    from retrain_model import retrain_model  # Import retrain function
+    from retrain_model import retrain_model
 
 @app.route("/retrain", methods=["GET"])
 def retrain():
-    retrain_model()  # Call retrain function to retrain the model
+    retrain_model()
     return "Model retrained successfully!"
 
 
 
-# --- Reset route: clears old results and goes home ---
+
 @app.route("/reset")
 def reset():
     session.pop("results_file", None)
@@ -158,8 +144,6 @@ def reset():
 
 
 
-# -----------------------------
-# Run
-# -----------------------------
+x
 if __name__ == "__main__":
     app.run(debug=True)
