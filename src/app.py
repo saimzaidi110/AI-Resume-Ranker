@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory, session, send_file, abort
 from pathlib import Path
 import pandas as pd
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename, safe_join
 from resume_parser import extract_text, extract_years_of_experience
 from ranker import rank_resumes
 import json
 import uuid
+import mimetypes
+import os
+import base64
 
 app = Flask(__name__, template_folder="../templates")
 app.secret_key = "supersecret"
@@ -94,6 +97,43 @@ def download_resume(filename):
         as_attachment=True,
         download_name=safe_name
     )
+    
+
+@app.get("/preview_bin")
+def preview_bin():
+    """
+    Inline preview stream. URL me extension nahi, aur content-type octet-stream.
+    Frontend blob ko 'application/pdf' set karega.
+    Use: /preview_bin?id=<base64url(filename)>
+    """
+    token = request.args.get("id")
+    if not token:
+        abort(400)
+
+    try:
+        # base64url decode without padding
+        pad = '=' * (-len(token) % 4)
+        filename = base64.urlsafe_b64decode(token + pad).decode("utf-8")
+    except Exception:
+        abort(400)
+
+    safe_name = secure_filename(filename)
+    full_path = safe_join(str(UPLOAD_FOLDER), safe_name)
+    if not full_path or not os.path.isfile(full_path):
+        abort(404)
+
+    # Check file extension and set the MIME type accordingly
+    mime_type, _ = mimetypes.guess_type(full_path)
+    if not mime_type:
+        mime_type = 'application/octet-stream'
+
+    if filename.lower().endswith(".pdf"):
+        mime_type = 'application/pdf'
+    
+    resp = send_file(full_path, mimetype=mime_type,
+                     as_attachment=False, download_name=os.path.basename(full_path))
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 #  Path to store feedback data
@@ -143,7 +183,5 @@ def reset():
     return redirect(url_for("index"))
 
 
-
-x
 if __name__ == "__main__":
     app.run(debug=True)
