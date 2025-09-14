@@ -280,6 +280,20 @@
       max-width: 100%;
       height: auto;
     }
+
+    #kwBadge {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+
+    #kwInput {
+      min-width: 0;
+    }
   </style>
 
 </head>
@@ -640,6 +654,19 @@
       });
     })();
   </script>
+
+  <script>
+    (function () {
+      const el = document.getElementById('kwBadge');
+      if (!el) return;
+      const full = el.textContent.trim();
+      if (!full || full.toLowerCase() === 'none') return;
+      el.setAttribute('data-bs-toggle', 'tooltip');
+      el.setAttribute('data-bs-title', full);
+      bootstrap.Tooltip.getOrCreateInstance(el, { placement: 'bottom', container: 'body', boundary: 'window' });
+    })();
+  </script>
+
 
 
 </body>
